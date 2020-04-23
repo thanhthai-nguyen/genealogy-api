@@ -1,0 +1,17 @@
+const passport = require("passport");
+
+module.exports = (req, res, next) => {
+    const token = req.header('Authorization').replace('Bearer ', '');
+
+    passport.authenticate('jwt', function(err, user, info) {
+        if (err) return next(err);
+
+        if (!user) return res.status(401).json({message: "Unauthorized Access - No Token Provided!"});
+
+        req.user = user;
+        req.token = token;
+
+        next();
+
+    })(req, res, next);
+};
