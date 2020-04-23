@@ -8,7 +8,7 @@ const path = require("path");
 
 // Setting up port
 const connUri = process.env.MONGO_LOCAL_CONN_URL;
-let PORT = process.env.PORT || 8080;
+//let PORT = process.env.PORT || 8080;
 
 //=== 1 - CREATE APP
 // Creating express app and configuring middleware needed for authentication
@@ -49,4 +49,9 @@ require('./routes/index')(app);
 
 
 //=== 5 - START SERVER
-app.listen(PORT, () => console.log('Server running on http://localhost:'+PORT+'/'));
+//app.listen(PORT, () => console.log('Server running on http://localhost:'+PORT+'/'));
+
+// Start the server on port 3000
+app.listen(process.env.PORT || 3000,()=>{
+    console.log('Connected to MongoDB Server, WebService running on port 3000');
+})
