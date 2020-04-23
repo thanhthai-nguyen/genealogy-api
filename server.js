@@ -26,7 +26,7 @@ app.set('view engine', 'jade');
 //Configure mongoose's promise to global promise
 mongoose.promise = global.Promise;
 mongoose.connect(connUri, { useNewUrlParser: true , useCreateIndex: true});
-
+/*
 const connection = mongoose.connection;
 connection.once('open', () => {
     console.log('MongoDB --  database connection established successfully!');
@@ -37,7 +37,7 @@ connection.on('error', (err) => {
     console.log('----------------------------------------------------------');
     process.exit();
 });
-
+*/
 //=== 3 - INITIALIZE PASSPORT MIDDLEWARE
 app.use(passport.initialize());
 require("./middlewares/jwt")(passport);
