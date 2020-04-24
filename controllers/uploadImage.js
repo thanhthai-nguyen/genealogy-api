@@ -7,7 +7,7 @@ const User = require('../models/user');
 
  //UpLoad Profile picture
  var storage = new GridFsStorage({
-    url: "mongodb://localhost:27017/genealogy",
+    url: process.env.MONGO_LOCAL_CONN_URL,
     options: { useNewUrlParser: true, useUnifiedTopology: true },
     file: (req, file) => {
       const match = ["image/png", "image/jpeg"];
