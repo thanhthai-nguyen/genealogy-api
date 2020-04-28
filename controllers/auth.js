@@ -64,13 +64,16 @@ exports.login = async  (req, res) => {
 //@access Publish
 exports.refreshToken = async  (req, res) => {
     try {
+        const userId = req.user._id;
+
+        const user = await User.findById(userId);
         const refreshToken = req.body.token;
 
         if (refreshToken == null) return res.sendStatus(401);
         if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
 
         // verify and generate new access token
-        jwt.verify(refreshToken, process.env.JWT_SECRET_REFRESH, (err, user) => {
+        jwt.verify(refreshToken, process.env.JWT_SECRET_REFRESH, (err) => {
             if (err) return res.sendStatus(403)
             const accessToken = user.generateJWT();
             res.json({ accessToken: accessToken });
