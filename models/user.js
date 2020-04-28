@@ -103,7 +103,7 @@ UserSchema.methods.comparePassword = function(password) {
 UserSchema.methods.generateJWT = function() {
     const today = new Date();
     const expirationDate = new Date(today);
-    expirationDate.setDate(today.getDate() + '15s');
+    expirationDate.setDate(today.getDate() + 1);
 
     let payload = {
         id: this._id,
