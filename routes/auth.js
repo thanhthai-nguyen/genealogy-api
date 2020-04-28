@@ -25,6 +25,9 @@ router.post("/login", [
 router.get('/verify/:token', Auth.verify);
 router.post('/resend', Auth.resendToken);
 
+//Refresh Token
+router.post('/refreshtoken', Auth.refreshToken);
+
 //Password RESET
 router.post('/recover', [
     check('email').isEmail().withMessage('Enter a valid email address'),
@@ -37,5 +40,7 @@ router.post('/reset/:token', [
     check('confirmPassword', 'Passwords do not match').custom((value, {req}) => (value === req.body.password)),
 ], validate, Password.resetPassword);
 
+//Logout
+router.delete('/logout', Auth.logout);
 
 module.exports = router;

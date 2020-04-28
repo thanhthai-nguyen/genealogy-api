@@ -103,7 +103,7 @@ UserSchema.methods.comparePassword = function(password) {
 UserSchema.methods.generateJWT = function() {
     const today = new Date();
     const expirationDate = new Date(today);
-    expirationDate.setDate(today.getDate() + 1);
+    expirationDate.setDate(today.getDate() + '15s');
 
     let payload = {
         id: this._id,
@@ -116,6 +116,19 @@ UserSchema.methods.generateJWT = function() {
     });
 };
 
+UserSchema.methods.generateJWTrefresh = function() {
+    const today = new Date();
+    const expirationDate = new Date(today);
+    expirationDate.setDate(today.getDate() + 3650);
+
+    let payload = {
+        id: this._id,
+        email: this.email,
+        username: this.username,
+    };
+
+    return jwt.sign(payload, process.env.JWT_SECRET_REFRESH);
+};
 UserSchema.methods.generatePasswordReset = function() {
     this.resetPasswordToken = crypto.randomBytes(20).toString('hex');
     this.resetPasswordExpires = Date.now() + 3600000; //expires in an hour

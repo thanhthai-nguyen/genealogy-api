@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const User = require('../models/user');
 const Token = require('../models/token');
 
@@ -29,6 +31,8 @@ exports.register = async (req, res) => {
 // @route POST api/auth/login
 // @desc Login user and return JWT token
 // @access Public
+let refreshTokens = [];
+
 exports.login = async  (req, res) => {
     try {
         const { email, password } = req.body;
@@ -44,14 +48,49 @@ exports.login = async  (req, res) => {
         if (!user.isVerified) return res.status(401).json({ type: 'not-verified', message: 'Your account has not been verified.' });
 
         // Login successful, write token, and send back user
-        res.status(200).json({token: user.generateJWT(), user: user});
+        const refreshToken = user.generateJWTrefresh();
+        refreshTokens.push(refreshToken);
+        res.status(200).json({accessToken: user.generateJWT(), refreshToken: refreshToken, user: user});
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+};
+
+//@route POST api/auth/refreshtoken
+//@desc Refresh Token
+//@access Publish
+exports.refreshToken = async  (req, res) => {
+    try {
+        const refreshToken = req.body.token;
+
+        if (refreshToken == null) return res.sendStatus(401);
+        if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+
+        // verify and generate new access token
+        jwt.verify(refreshToken, process.env.JWT_SECRET_REFRESH, (err, user) => {
+            if (err) return res.sendStatus(403)
+            const accessToken = user.generateJWT();
+            res.json({ accessToken: accessToken });
+          });
+    } catch (error) {
+        res.status(500).json({message: error.message})
+    }
+};
+
+//@route DELETE api/auth/logout
+//@desc Logout
+//@access Publish
+exports.logout = async  (req, res) => {
+    try {
+        refreshTokens = refreshTokens.filter(token => token !== req.body.token);
+        res.sendStatus(204);
     } catch (error) {
         res.status(500).json({message: error.message})
     }
 };
 
 // ===EMAIL VERIFICATION
-// @route GET api/verify/:token
+// @route GET api/auth/verify/:token
 // @desc Verify token
 // @access Public
 exports.verify = async (req, res) => {
@@ -82,7 +121,7 @@ exports.verify = async (req, res) => {
     }
 };
 
-// @route POST api/resend
+// @route POST api/auth/resend
 // @desc Resend Verification Token
 // @access Public
 exports.resendToken = async (req, res) => {
