@@ -24,8 +24,6 @@ router.get('/show', User.show);
 //UPDATE
 router.put('/update', uploadImage.uploadFile ,User.update);
 
-//LOGOUT
-router.get('/logout', User.logout);
 
 //DELETE
 router.delete('/destroy', User.destroy);

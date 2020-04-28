@@ -130,14 +130,14 @@ UserSchema.methods.generateJWTrefresh = function() {
     return jwt.sign(payload, process.env.JWT_SECRET_REFRESH);
 };
 UserSchema.methods.generatePasswordReset = function() {
-    this.resetPasswordToken = crypto.randomBytes(20).toString('hex');
+    this.resetPasswordToken = crypto.randomBytes(64).toString('hex');
     this.resetPasswordExpires = Date.now() + 3600000; //expires in an hour
 };
 
 UserSchema.methods.generateVerificationToken = function() {
     let payload = {
         userId: this._id,
-        token: crypto.randomBytes(20).toString('hex')
+        token: crypto.randomBytes(64).toString('hex')
     };
 
     return new Token(payload);
