@@ -1,9 +1,12 @@
 require('dotenv').config();
 
+const jwt = require('jsonwebtoken')
 const User = require('../models/user');
 const Token = require('../models/token');
 
 const sendEMail = require('../controllers/sendEmail');
+
+let refreshTokens = []
 
 // @route POST api/auth/register
 // @desc Register user
@@ -31,7 +34,7 @@ exports.register = async (req, res) => {
 // @route POST api/auth/login
 // @desc Login user and return JWT token
 // @access Public
-let refreshTokens = [];
+
 
 exports.login = async  (req, res) => {
     try {
