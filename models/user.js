@@ -103,7 +103,7 @@ UserSchema.methods.comparePassword = function(password) {
 UserSchema.methods.generateJWT = function() {
     const today = new Date();
     const expirationDate = new Date(today);
-    expirationDate.setDate(today.getDate() + 1);
+    expirationDate.setDate(today.getDate());
 
     let payload = {
         id: this._id,
@@ -112,7 +112,7 @@ UserSchema.methods.generateJWT = function() {
     };
 
     return jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: parseInt(expirationDate.getTime() / 1000, 10)
+        expiresIn: parseInt((expirationDate.getTime() + 900000) / 1000, 10)
     });
 };
 

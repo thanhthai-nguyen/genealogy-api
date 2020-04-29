@@ -61,7 +61,7 @@ exports.login = async  (req, res) => {
 
 //@route POST api/auth/refreshtoken
 //@desc Refresh Token
-//@access Publish
+//@access Private
 exports.refreshToken = async  (req, res) => {
     try {
         const { email } = req.body;
