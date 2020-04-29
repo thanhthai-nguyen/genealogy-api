@@ -112,7 +112,7 @@ UserSchema.methods.generateJWT = function() {
     };
 
     return jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: '30s'
+        expiresIn: '15m'
     });
 };
 
