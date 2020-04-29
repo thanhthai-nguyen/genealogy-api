@@ -112,14 +112,14 @@ UserSchema.methods.generateJWT = function() {
     };
 
     return jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: parseInt((expirationDate.getTime() + 900000) / 1000, 10)
+        expiresIn: parseInt(expirationDate.getTime() / 1000, 10) + (1 * 60)
     });
 };
 
 UserSchema.methods.generateJWTrefresh = function() {
     const today = new Date();
     const expirationDate = new Date(today);
-    expirationDate.setDate(today.getDate() + 3650);
+    expirationDate.setDate(today.getDate() + 60);
 
     let payload = {
         id: this._id,
@@ -127,7 +127,9 @@ UserSchema.methods.generateJWTrefresh = function() {
         username: this.username,
     };
 
-    return jwt.sign(payload, process.env.JWT_SECRET_REFRESH);
+    return jwt.sign(payload, process.env.JWT_SECRET_REFRESH, {
+        expiresIn: parseInt(expirationDate.getTime() / 1000, 10)
+    });
 };
 UserSchema.methods.generatePasswordReset = function() {
     this.resetPasswordToken = crypto.randomBytes(64).toString('hex');
