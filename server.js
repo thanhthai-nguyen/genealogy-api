@@ -25,14 +25,7 @@ app.set('view engine', 'jade');
 //=== 2 - SET UP DATABASE
 //Configure mongoose's promise to global promise
 mongoose.promise = global.Promise;
-mongoose
-    .connect(connUri, { 
-        useNewUrlParser: true , 
-        useCreateIndex: true, 
-        useFindAndModify: false,
-        useUnifiedTopology: true,
-    })
-    .then(() => console.log('DB connection successful!'));
+mongoose.connect(connUri, { useNewUrlParser: true , useCreateIndex: true});
 /*
 const connection = mongoose.connection;
 connection.once('open', () => {
