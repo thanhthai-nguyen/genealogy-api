@@ -21,7 +21,10 @@ connection.once('open', () => {
 
  //UpLoad Profile picture
  var storage = new GridFsStorage({
-    url: process.env.MONGO_LOCAL_CONN_URL,
+    url: process.env.MONGO_LOCAL_CONN_URL.replace(
+      '<password>',
+      process.env.DATABASE_PASSWORD
+    ),
     options: { useNewUrlParser: true, useUnifiedTopology: true },
     file: (req, file) => {
       const match = ["image/png", "image/jpeg"];

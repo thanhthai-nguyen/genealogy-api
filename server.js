@@ -7,7 +7,10 @@ const passport = require("passport");
 const path = require("path");
 
 // Setting up port
-const connUri = process.env.MONGO_LOCAL_CONN_URL;
+const connUri = process.env.MONGO_LOCAL_CONN_URL.replace(
+            '<password>',
+            process.env.DATABASE_PASSWORD
+        );
 let PORT = process.env.PORT || 3000;
 
 //=== 1 - CREATE APP
@@ -25,7 +28,14 @@ app.set('view engine', 'jade');
 //=== 2 - SET UP DATABASE
 //Configure mongoose's promise to global promise
 mongoose.promise = global.Promise;
-mongoose.connect(connUri, { useNewUrlParser: true , useCreateIndex: true});
+mongoose
+    .connect(connUri, { 
+        useNewUrlParser: true , 
+        useCreateIndex: true, 
+        useFindAndModify: false,
+        useUnifiedTopology: true,
+    })
+    .then(() => console.log('DB connection successful!'));
 /*
 const connection = mongoose.connection;
 connection.once('open', () => {
