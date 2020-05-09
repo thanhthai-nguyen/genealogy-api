@@ -1,4 +1,4 @@
-require('dotenv').config();
+dotenv.config({ path: '../.env' });
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -34,8 +34,7 @@ mongoose
         useCreateIndex: true, 
         useFindAndModify: false,
         useUnifiedTopology: true,
-    })
-    .then(() => console.log('DB connection successful!'));
+    });
 /*
 const connection = mongoose.connection;
 connection.once('open', () => {
