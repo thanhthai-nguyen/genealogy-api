@@ -36,7 +36,7 @@ connection.once('open', () => {
 
       return {
         bucketName: "photos",
-        filename: `amadeus-${Date.now()}-${file.originalname}`
+        filename: `genealogy-${Date.now()}-${file.originalname}`
       };
     }
   });
