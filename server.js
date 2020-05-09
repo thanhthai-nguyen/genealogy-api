@@ -1,4 +1,4 @@
-dotenv.config({ path: '../.env' });
+require('dotenv').config();
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -7,10 +7,7 @@ const passport = require("passport");
 const path = require("path");
 
 // Setting up port
-const connUri = process.env.MONGO_LOCAL_CONN_URL.replace(
-            '<password>',
-            process.env.DATABASE_PASSWORD
-        );
+const connUri = process.env.MONGO_LOCAL_CONN_URL;
 let PORT = process.env.PORT || 3000;
 
 //=== 1 - CREATE APP
@@ -34,7 +31,8 @@ mongoose
         useCreateIndex: true, 
         useFindAndModify: false,
         useUnifiedTopology: true,
-    });
+    })
+    .then(() => console.log('DB connection successful!'));
 /*
 const connection = mongoose.connection;
 connection.once('open', () => {
