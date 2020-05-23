@@ -16,7 +16,7 @@
 # End of https://www.gitignore.io/api/visualstudiocode
 
 # dotenv environment variables file
-
+.env
 
 # Dependency directories
-
+node_modules/
