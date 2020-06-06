@@ -21,7 +21,7 @@ router.post('/', [
 //SHOW
 router.get('/show', User.show);
 
-//UPDATE
+//UPDATE USER 
 router.put('/update', uploadImage.uploadFile ,User.update);
 
 //DISPLAY IMAGE
@@ -29,5 +29,11 @@ router.get('/image/:filename', uploadImage.displayImage);
 
 //DELETE
 router.delete('/destroy', User.destroy);
+
+//CREATE EVENT
+router.post('/event', User.events);
+
+//UPDATE EVENT
+router.put('/eventupdate', uploadImage.uploadFile ,User.eventUpdate);
 
 module.exports = router;

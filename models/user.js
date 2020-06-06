@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const Token = require('../models/token');
+const Event = require('../models/event');
 
 const UserSchema = new mongoose.Schema({
     email: {
@@ -35,6 +36,7 @@ const UserSchema = new mongoose.Schema({
     numphone: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
@@ -45,9 +47,8 @@ const UserSchema = new mongoose.Schema({
     },
     
     datebirth: {
-        type: String,
+        type: Date,
         required: false,
-        max: 255
     },
 
     address: {
@@ -128,7 +129,7 @@ UserSchema.methods.generateJWTrefresh = function() {
     };
 
     return jwt.sign(payload, process.env.JWT_SECRET_REFRESH, {
-        expiresIn: parseInt(expirationDate.getTime() / 1000, 10)
+        expiresIn: '30d'
     });
 };
 UserSchema.methods.generatePasswordReset = function() {
@@ -143,6 +144,14 @@ UserSchema.methods.generateVerificationToken = function() {
     };
 
     return new Token(payload);
+};
+
+UserSchema.methods.generateEvent = function() {
+    let payload = {
+        userId: this._id
+    };
+
+    return new Event(payload);
 };
 
 mongoose.set('useFindAndModify', false);
