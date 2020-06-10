@@ -48,4 +48,22 @@ GET: /api/user/show (x-www-form-urlencoded)
 -----Display Image-------
 GET: /api/user/image/:filename
 
+-----Create Event--------
+POST: /api/user/event
+
+-----Update Event--------
+PUT: /api/user/eventupdate
+	id(id sự kiện)
+	event(tên sự kiện)
+	address(nơi tổ chức)
+	bio(mô tả)
+	catelogy(loại sự kiện)
+	date(ngày diễn ra)
+	time(giờ diễn ra)
+	group(nhóm sự kiện. VD: Bên nội)
+	eventImage(ảnh sự kiện)
+
+-----GET Events--------
+GET: /api/user/eventshow (trả về toàn bộ sự kiện của user đó)
 --------------------------------------------
+

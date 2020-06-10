@@ -9,7 +9,7 @@ const eventSchema = new mongoose.Schema({
 
     event: {
         type: String,
-        required: true,
+        required: false,
         max: 255
     },
 
@@ -19,8 +19,8 @@ const eventSchema = new mongoose.Schema({
     },
 
     date: {
-        type: Date,
-        required: true
+        type: String,
+        required: false
     },
 
     catelogy: {

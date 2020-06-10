@@ -1,5 +1,8 @@
 const User = require('../models/user');
+const Event = require('../models/event');
+
 const sendEMail = require('../controllers/sendEmail');
+const {ObjectId} = require('mongodb');
 
 
 // @route GET admin/user
@@ -129,11 +132,16 @@ exports.destroy = async function (req, res) {
 // @access Public
 exports.events = async function (req, res) {
     try {
+        const userId = req.user._id;
+
         //Make sure the passed id is that of the logged in user
         //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
         if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
         // if they aren't redirect them to the home page
         // res.redirect('/');
+
+
+        const user = await User.findById(userId);
 
         const event = user.generateEvent();
         // Save the updated event object
@@ -152,19 +160,17 @@ exports.events = async function (req, res) {
 exports.eventUpdate = async function (req, res) {
     try {
         const update = req.body;
-        const { _id } = req.body;
+        const id = req.body.id;
         const userId = req.user._id;
-
-        _id  instanceof mongoose.Types.ObjectId;
-
-
+        
+        
         //Make sure the passed id is that of the logged in user
         //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
         if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
         // if they aren't redirect them to the home page
        // res.redirect('/');
 
-        const event = await Event.findByIdAndUpdate(_id, {$set: update}, {new: true});
+        const event = await Event.findByIdAndUpdate( {_id: ObjectId(id)}, {$set: update}, {new: true});
 
         //if there is no image, return success message
         if (!req.file) {
@@ -173,11 +179,36 @@ exports.eventUpdate = async function (req, res) {
         }
         
         // There is image
-        const event_ = await Event.findByIdAndUpdate(_id, {$set: {eventImage: req.file.filename}}, {new: true});
+        const event_ = await Event.findByIdAndUpdate( {_id: ObjectId(id)}, {$set: {eventImage: req.file.filename}}, {new: true});
         //console.log('User '+ user_.email +' uploaded image');
 
         return res.status(200).json({event: event_, message: 'Event has been updated'});
 
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route GET api/user/{id}
+// @desc GET all events details of user
+// @access Public
+exports.eventShow = async function (req, res) {
+    try {
+        const userId = req.user._id;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const event = await Event.find({userId: userId});
+
+        if (!event) return res.status(401).json({message: 'There are no events to display'});
+
+        res.status(200).json({event});
     } catch (error) {
         
         res.status(500).json({message: error.message});

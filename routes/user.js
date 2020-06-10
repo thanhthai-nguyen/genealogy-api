@@ -36,4 +36,7 @@ router.post('/event', User.events);
 //UPDATE EVENT
 router.put('/eventupdate', uploadImage.uploadFile ,User.eventUpdate);
 
+//GET EVENTS
+router.get('/eventshow', User.eventShow);
+
 module.exports = router;

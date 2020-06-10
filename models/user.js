@@ -47,8 +47,9 @@ const UserSchema = new mongoose.Schema({
     },
     
     datebirth: {
-        type: Date,
+        type: String,
         required: false,
+        max: 255
     },
 
     address: {
@@ -113,7 +114,7 @@ UserSchema.methods.generateJWT = function() {
     };
 
     return jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: '15m'
+        expiresIn: '15m' //expires in 15m
     });
 };
 
@@ -129,7 +130,7 @@ UserSchema.methods.generateJWTrefresh = function() {
     };
 
     return jwt.sign(payload, process.env.JWT_SECRET_REFRESH, {
-        expiresIn: '30d'
+        expiresIn: '43200m' //expires in 30d
     });
 };
 UserSchema.methods.generatePasswordReset = function() {
