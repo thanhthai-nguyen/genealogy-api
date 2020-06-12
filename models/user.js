@@ -6,13 +6,16 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const Token = require('../models/token');
 const Event = require('../models/event');
+const Family = require('../models/family');
+
 
 const UserSchema = new mongoose.Schema({
     email: {
         type: String,
         unique: true,
         required: 'Your email is required',
-        trim: true
+        trim: true,
+        lowercase: true
     },
 
     username: {
@@ -153,6 +156,14 @@ UserSchema.methods.generateEvent = function() {
     };
 
     return new Event(payload);
+};
+
+UserSchema.methods.generateFamily = function() {
+    let payload = {
+        userId: this._id
+    };
+
+    return new Family(payload);
 };
 
 mongoose.set('useFindAndModify', false);

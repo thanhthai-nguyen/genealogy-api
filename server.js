@@ -22,8 +22,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('views', path.join(__dirname, 'views')); // Thư mục views nằm cùng cấp với file server.js
+app.set('view engine', 'jade'); // Sử dụng jade làm view engine
 
 //=== 2 - SET UP DATABASE
 //Configure mongoose's promise to global promise
