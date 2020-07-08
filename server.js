@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views')); // Thư mục views nằm cùng cấp với file server.js
-app.set('view engine', 'jade'); // Sử dụng jade làm view engine
+app.set('view engine', 'ejs'); // Sử dụng jade làm view engine
 
 //=== 2 - SET UP DATABASE
 //Configure mongoose's promise to global promise
@@ -51,7 +51,7 @@ connection.on('error', (err) => {
 //=== 3 - INITIALIZE PASSPORT MIDDLEWARE
 app.use(passport.initialize());
 require("./middlewares/jwt")(passport);
-
+require('./config/passport')(passport);
 
 //=== 4 - CONFIGURE ROUTES
 //Configure Route

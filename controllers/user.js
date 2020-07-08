@@ -1,6 +1,9 @@
 const User = require('../models/user');
 const Event = require('../models/event');
 const Family = require('../models/family');
+const FamilyRoot = require('../models/familyRoot');
+const FamilyLeaf = require('../models/familyLeaf');
+
 
 const sendEMail = require('../controllers/sendEmail');
 const {ObjectId} = require('mongodb');
@@ -279,8 +282,9 @@ exports.family = async function (req, res) {
         const family = user.generateFamily();
 
         //Set the name
-        family.firstname = 'Elizabeth';
-        family.lastname = 'Elise';
+        family.firstname = 'Họ';
+        family.middlename = "";
+        family.lastname = 'Tên';
        
         // Save the updated event object
         await family.save();
@@ -309,7 +313,9 @@ exports.familyUpdate = async function (req, res) {
        // res.redirect('/');
 
         const family = await Family.findByIdAndUpdate( {_id: ObjectId(id)}, {$set: update}, {new: true});
-
+        
+        await family.save();
+ 
         //if there is no image, return success message
         if (!req.file) {
             //console.log('User '+ user.email +' updated profile');
@@ -319,6 +325,8 @@ exports.familyUpdate = async function (req, res) {
         // There is image
         const family_ = await Family.findByIdAndUpdate( {_id: ObjectId(id)}, {$set: {profileImage: req.file.filename}}, {new: true});
         //console.log('User '+ user_.email +' uploaded image');
+
+        await family.save();
 
         return res.status(200).json({family: family_, message: 'Family has been updated'});
 
@@ -398,7 +406,7 @@ exports.familySearch = async function (req, res) {
         const result = family.filter( (family) => {
 		// tìm kiếm chuỗi name_search trong user name. 
 		// Lưu ý: Chuyển tên về cùng in thường hoặc cùng in hoa để không phân biệt hoa, thường khi tìm kiếm
-		return family.lastname.toLowerCase().indexOf(name.toLowerCase()) !== -1
+		return family.fullname.toLowerCase().indexOf(name.toLowerCase()) !== -1
     	})
 
         if (!result) return res.status(401).json({message: 'There are no info to display'});
@@ -425,6 +433,276 @@ exports.destroyFamily = async function (req, res) {
         await Family.findByIdAndDelete({_id: ObjectId(id)});
         res.status(200).json({message: 'The family has been deleted'});
     } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route POST api/user/{id}
+// @desc  Create a new Family Root
+// @access Public
+exports.familyRoot = async function (req, res) {
+    try {
+        const userId = req.user._id;
+
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+        // res.redirect('/');
+
+
+        const user = await User.findById(userId);
+
+        const root = user.generateFamilyRoot();
+        // Save the updated event object
+        await root.save();
+
+        res.status(200).json({ root: root });
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route POST api/user/{id}
+// @desc  Create a new Family Leaf
+// @access Public
+exports.familyLeaf = async function (req, res) {
+    try {
+        const userId = req.user._id;
+        const rootId = req.body.rootId;
+
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+        // res.redirect('/');
+
+
+        const root = await FamilyRoot.findById(rootId);
+
+        const leaf = root.generateFamilyLeaf();
+        // Save the updated event object
+        await leaf.save();
+
+        res.status(200).json({ leaf: leaf });
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route POST api/user/{id}
+// @desc  Create a new Family Leaf is Spouse
+// @access Public
+exports.familyLeafisSpouse = async function (req, res) {
+    try {
+        const userId = req.user._id;
+        const rootId = req.body.rootId;
+
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+        // res.redirect('/');
+
+
+        const root = await FamilyRoot.findById(rootId);
+
+        const leaf = root.generateFamilyLeaf();
+
+        //Set is Spouse
+        leaf.isSpouse = true;
+
+        // Save the updated event object
+        await leaf.save();
+
+        res.status(200).json({ leaf: leaf });
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route PUT api/user/{id}
+// @desc Update family Root
+// @access Public
+exports.rootUpdate = async function (req, res) {
+    try {
+        const update = req.body;
+        const rootId = req.body.rootId;
+        const userId = req.user._id;
+        
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const root = await FamilyRoot.findByIdAndUpdate( {_id: ObjectId(rootId)}, {$set: update}, {new: true});
+        
+        await root.save();
+ 
+        //if there is no image, return success message
+        if (!req.file) {
+            //console.log('User '+ user.email +' updated profile');
+            return res.status(200).json({root, message: 'Family Root has been updated'});
+        }
+        
+        // There is image
+        const root_ = await FamilyRoot.findByIdAndUpdate( {_id: ObjectId(rootId)}, {$set: {profileImage: req.file.filename}}, {new: true});
+        //console.log('User '+ user_.email +' uploaded image');
+
+        await root_.save();
+
+        return res.status(200).json({root: root_, message: 'Family Root has been updated'});
+
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route PUT api/user/{id}
+// @desc Update family Leaf
+// @access Public
+exports.rootUpdate = async function (req, res) {
+    try {
+        const update = req.body;
+        const leafId = req.body.leafId;
+        const userId = req.user._id;
+        
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const leaf = await FamilyLeaf.findByIdAndUpdate( {_id: ObjectId(leafId)}, {$set: update}, {new: true});
+        
+        await leaf.save();
+ 
+        //if there is no image, return success message
+        if (!req.file) {
+            //console.log('User '+ user.email +' updated profile');
+            return res.status(200).json({leaf, message: 'Family Leaf has been updated'});
+        }
+        
+        // There is image
+        const leaf_ = await FamilyRoot.findByIdAndUpdate( {_id: ObjectId(leafId)}, {$set: {profileImage: req.file.filename}}, {new: true});
+        //console.log('User '+ user_.email +' uploaded image');
+
+        await leaf_.save();
+
+        return res.status(200).json({leaf: leaf_, message: 'Family Leaf has been updated'});
+
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route POST api/user/{id}
+// @desc GET the family Root details of user
+// @access Public
+exports.familyRootShowOne = async function (req, res) {
+    try {
+        const userId = req.user._id;
+        const rootId = req.body.rootId;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const root = await FamilyRoot.findById( {_id: ObjectId(rootId)});
+
+        if (!root) return res.status(401).json({message: 'There are no info to display'});
+
+        res.status(200).json({root});
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+// @route POST api/user/{id}
+// @desc GET the family Leaf details of user
+// @access Public
+exports.familyLeafShowOne = async function (req, res) {
+    try {
+        const userId = req.user._id;
+        const leafId = req.body.leafId;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const leaf = await FamilyLeaf.findById( {_id: ObjectId(leafId)});
+
+        if (!leaf) return res.status(401).json({message: 'There are no info to display'});
+
+        res.status(200).json({leaf});
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route GET api/user/{id}
+// @desc GET all Family Root details of user
+// @access Public
+exports.familyRootShow = async function (req, res) {
+    try {
+        const userId = req.user._id;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const root = await FamilyRoot.find({userId: userId});
+
+        if (!root) return res.status(401).json({message: 'There are no info to display'});
+
+        res.status(200).json({root});
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route GET api/user/{id}
+// @desc GET all Family Leaf details of Family Root
+// @access Public
+exports.familyLeafShow = async function (req, res) {
+    try {
+        const rootId = req.user.rootId;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const leaf = await FamilyLeaf.find({rootId: rootId});
+
+        if (!leaf) return res.status(401).json({message: 'There are no info to display'});
+
+        res.status(200).json({leaf});
+    } catch (error) {
+        
         res.status(500).json({message: error.message});
     }
 };

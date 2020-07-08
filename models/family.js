@@ -15,14 +15,17 @@ const familySchema = new mongoose.Schema({
 
     middlename: {
         type: String,
-        required: false,
-        trim: true
+        required: false
     },
 
     lastname: {
         type: String,
         required: 'Your last name is required',
-        trim: true
+    },
+
+    fullname: {
+        type: String,
+        required: false,
     },
 
     email: {
@@ -42,6 +45,7 @@ const familySchema = new mongoose.Schema({
     numphone: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
@@ -54,6 +58,7 @@ const familySchema = new mongoose.Schema({
     datebirth: {
         type: String,
         required: false,
+        trim: true
     },
 
     address: {
@@ -101,6 +106,7 @@ const familySchema = new mongoose.Schema({
     profileImage: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
@@ -110,6 +116,23 @@ const familySchema = new mongoose.Schema({
         default: Date.now
     }
 }, {timestamps: true});
+
+
+familySchema.pre('save',  function(next) {
+    const person = this;
+    const firstname = person.firstname + " ";
+    const middlename = person.middlename + " ";
+    if (person.middlename != null && person.middlename != "") {
+
+        person.fullname = firstname + middlename + person.lastname;
+
+    }else {
+
+        person.fullname = firstname + person.lastname;
+
+    }
+    next();
+});
 
 
 mongoose.set('useFindAndModify', false);

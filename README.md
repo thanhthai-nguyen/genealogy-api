@@ -109,5 +109,5 @@ DELETE: /api/user/destroyfamily (xóa family theo ID)
 	id(id family)
 
 -----Search Family---------
-POST: /api/user/familyshowone (tìm kiếm family theo tên dựa vào trường lastname có phân biệt dấu tiếng Việt, dấu cách, xuống dòng.... VD: nhập name='th' sẽ trả về tên có chứa chuỗi 'th')
+POST: /api/user/familysearch (tìm kiếm family theo tên dựa vào trường lastname có phân biệt dấu tiếng Việt, dấu cách, xuống dòng.... VD: nhập name='th' sẽ trả về tên có chứa chuỗi 'th')
 	name(nội dung cần search)

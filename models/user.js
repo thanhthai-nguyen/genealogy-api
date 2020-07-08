@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const Token = require('../models/token');
 const Event = require('../models/event');
 const Family = require('../models/family');
+const FamilyRoot = require('../models/familyRoot');
 
 
 const UserSchema = new mongoose.Schema({
@@ -152,7 +153,8 @@ UserSchema.methods.generateVerificationToken = function() {
 
 UserSchema.methods.generateEvent = function() {
     let payload = {
-        userId: this._id
+        userId: this._id,
+        eventImage: null
     };
 
     return new Event(payload);
@@ -160,10 +162,20 @@ UserSchema.methods.generateEvent = function() {
 
 UserSchema.methods.generateFamily = function() {
     let payload = {
-        userId: this._id
+        userId: this._id,
+        profileImage: null
     };
 
     return new Family(payload);
+};
+
+UserSchema.methods.generateFamilyRoot = function() {
+    let payload = {
+        userId: this._id,
+        profileImage: null
+    };
+
+    return new FamilyRoot(payload);
 };
 
 mongoose.set('useFindAndModify', false);

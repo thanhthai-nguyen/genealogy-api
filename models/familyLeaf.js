@@ -1,57 +1,79 @@
 const mongoose = require('mongoose');
 
-const eventSchema = new mongoose.Schema({
+const leafSchema = new mongoose.Schema({
+    rootId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'FamilyRoots'
+    },
+
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User'
     },
 
-    event: {
+    firstname: {
         type: String,
-        required: false,
-        max: 255
+        required: 'Your first name is required',
+        trim: true
     },
 
-    time: {
+    middlename: {
         type: String,
         required: false
     },
 
-    date: {
+    lastname: {
         type: String,
-        required: false
+        required: 'Your last name is required'
     },
 
-    catelogy: {
+    nickname: {
         type: String,
         required: false,
         max: 255
     },
 
-    group: {
+    sex: {
         type: String,
         required: false,
         max: 255
     },
 
-    bio: {
+    dob: {
         type: String,
         required: false,
         max: 255
     },
 
-    address: {
+    domicile: {
         type: String,
         required: false,
         max: 255
     },
 
-    eventImage: {
+    dod: {
         type: String,
         required: false,
-        trim: true,
         max: 255
+    },
+
+    burialplace: {
+        type: String,
+        required: false,
+        max: 255
+    },
+
+    profileImage: {
+        type: String,
+        required: false,
+        max: 255
+    },
+
+    isSpouse: {
+        type: Boolean,
+        default: false
     },
 
     createdAt: {
@@ -64,4 +86,4 @@ const eventSchema = new mongoose.Schema({
 
 
 mongoose.set('useFindAndModify', false);
-module.exports = mongoose.model('Events', eventSchema);
+module.exports = mongoose.model('FamilyLeaf', leafSchema);

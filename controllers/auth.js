@@ -3,10 +3,11 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken')
 const User = require('../models/user');
 const Token = require('../models/token');
+const RefreshToken = require('../models/refreshtoken');
 
-const sendEMail = require('../controllers/sendEmail');
 
-let refreshTokens = []
+const sendEMail = require('./sendEmail');
+
 
 // @route POST api/auth/register
 // @desc Register user
@@ -21,6 +22,8 @@ exports.register = async (req, res) => {
         if (user) return res.status(401).json({message: 'The email address you have entered is already associated with another account.'});
 
         const newUser = new User({ ...req.body, role: "basic" });
+
+        newUser.profileImage = null;
 
         const user_ = await newUser.save();
 
@@ -52,8 +55,17 @@ exports.login = async  (req, res) => {
 
         // Login successful, write token, and send back user
         const refreshToken = user.generateJWTrefresh();
-        refreshTokens.push(refreshToken);
-        res.status(200).json({accessToken: user.generateJWT(), refreshToken: refreshToken, user: user});
+        const checkToken = await RefreshToken.findOne({token: refreshToken});
+        if (checkToken)return res.status(401).json({msg: 'The login process has encountered an error, please log in again'});
+
+        const newRefreshToken = new RefreshToken({
+            userId: user._id,
+            token: refreshToken
+        });
+
+        await newRefreshToken.save();
+
+        res.status(200).json({accessToken: user.generateJWT(), refreshToken: newRefreshToken.token, user: user});
     } catch (error) {
         res.status(500).json({message: error.message})
     }
@@ -70,12 +82,15 @@ exports.refreshToken = async  (req, res) => {
         
         const refreshToken = req.body.token;
 
-        if (refreshToken == null) return res.sendStatus(401);
-        if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
+        if (refreshToken == null) return res.sendStatus(401).json({message: 'Error refreshToken null'});
+
+        const checkToken = await RefreshToken.findOne({token: refreshToken});
+
+        if (!checkToken) return res.sendStatus(403).json({message: 'The refreshToken has expired'});
 
         // verify and generate new access token
-        jwt.verify(refreshToken, process.env.JWT_SECRET_REFRESH, (err) => {
-            if (err) return res.sendStatus(403)
+        jwt.verify(checkToken.token, process.env.JWT_SECRET_REFRESH, (err) => {
+            if (err) return res.sendStatus(403).json({message: 'Authentication error. Please check out the refresh token'});
             res.json({ accessToken: user.generateJWT() });
           });
     } catch (error) {
@@ -88,7 +103,7 @@ exports.refreshToken = async  (req, res) => {
 //@access Publish
 exports.logout = async  (req, res) => {
     try {
-        refreshTokens = refreshTokens.filter(token => token !== req.body.token);
+        const removeToken = await RefreshToken.deleteOne({token: req.body.token});
         res.sendStatus(204);
     } catch (error) {
         res.status(500).json({message: error.message})
