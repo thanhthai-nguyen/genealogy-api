@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const FamilyLeaf = require('../models/familyLeaf');
 
 const rootSchema = new mongoose.Schema({
     userId: {
@@ -21,7 +22,7 @@ const rootSchema = new mongoose.Schema({
 
     authoraddress: {
         type: String,
-        required: 'Author address is required',
+        required: false,
         max: 255
     },
 
@@ -39,6 +40,11 @@ const rootSchema = new mongoose.Schema({
     lastname: {
         type: String,
         required: 'Your last name is required'
+    },
+
+    fullname: {
+        type: String,
+        required: false,
     },
 
     nickname: {
@@ -90,6 +96,22 @@ const rootSchema = new mongoose.Schema({
     }
 
 }, {timestamps: true});
+
+rootSchema.pre('save',  function(next) {
+    const person = this;
+    const firstname = person.firstname + " ";
+    const middlename = person.middlename + " ";
+    if (person.middlename != null && person.middlename != "") {
+
+        person.fullname = firstname + middlename + person.lastname;
+
+    }else {
+
+        person.fullname = firstname + person.lastname;
+
+    }
+    next();
+});
 
 rootSchema.methods.generateFamilyLeaf = function() {
     let payload = {

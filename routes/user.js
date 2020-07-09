@@ -66,5 +66,31 @@ router.post('/familysearch', User.familySearch);
 //DELETE The Family
 router.delete('/destroyfamily', User.destroyFamily);
 
+//Create Genealogy
+router.get('/root', User.familyRoot);
+
+//Create leaf
+router.post('/leaf', User.familyLeaf);
+
+//Create Spouse leaf
+router.post('/spouseleaf', User.familyLeafisSpouse);
+
+//Update Root
+router.put('/rootupdate', uploadImage.uploadFile, User.rootUpdate);
+
+//Update Leaf
+router.put('/leafupdate', uploadImage.uploadFile, User.leafUpdate);
+
+//GET the family Root details of user
+router.post('/rootshowone', User.familyRootShowOne);
+
+//GET the family Leaf details of its root
+router.post('/leafshowone', User.familyLeafShowOne);
+
+//GET all Family Root details of user
+router.get('/rootshowall', User.familyRootShow);
+
+//GET all Family Leaf details of its Root
+router.post('/leafshowall', User.familyLeafShow);
 
 module.exports = router;

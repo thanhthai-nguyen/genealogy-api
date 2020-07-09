@@ -29,6 +29,11 @@ const leafSchema = new mongoose.Schema({
         required: 'Your last name is required'
     },
 
+    fullname: {
+        type: String,
+        required: false,
+    },
+    
     nickname: {
         type: String,
         required: false,
@@ -84,6 +89,22 @@ const leafSchema = new mongoose.Schema({
 
 }, {timestamps: true});
 
+leafSchema.pre('save',  function(next) {
+    const person = this;
+    const firstname = person.firstname + " ";
+    const middlename = person.middlename + " ";
+    if (person.middlename != null && person.middlename != "") {
+
+        person.fullname = firstname + middlename + person.lastname;
+
+    }else {
+
+        person.fullname = firstname + person.lastname;
+
+    }
+    next();
+});
+
 
 mongoose.set('useFindAndModify', false);
-module.exports = mongoose.model('FamilyLeaf', leafSchema);
+module.exports = mongoose.model('FamilyLeafs', leafSchema);
