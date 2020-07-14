@@ -7,7 +7,6 @@ const crypto = require('crypto');
 const Token = require('../models/token');
 const Event = require('../models/event');
 const Family = require('../models/family');
-const FamilyRoot = require('../models/familyRoot');
 
 
 const UserSchema = new mongoose.Schema({
@@ -118,7 +117,7 @@ UserSchema.methods.generateJWT = function() {
     };
 
     return jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: '15m' //expires in 15m
+        expiresIn: '43200m' //expires in 15m
     });
 };
 
@@ -169,14 +168,6 @@ UserSchema.methods.generateFamily = function() {
     return new Family(payload);
 };
 
-UserSchema.methods.generateFamilyRoot = function() {
-    let payload = {
-        userId: this._id,
-        profileImage: null
-    };
-
-    return new FamilyRoot(payload);
-};
 
 mongoose.set('useFindAndModify', false);
 module.exports = mongoose.model('Users', UserSchema);

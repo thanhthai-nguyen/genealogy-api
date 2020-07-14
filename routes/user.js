@@ -24,6 +24,9 @@ router.get('/show', User.show);
 //UPDATE USER 
 router.put('/update', uploadImage.uploadFile ,User.update);
 
+//UPLOAD IMAGE
+router.post('/uploadimg', uploadImage.uploadFile, User.uploadimage);
+
 //DISPLAY IMAGE
 router.get('/image/:filename', uploadImage.displayImage);
 
@@ -66,31 +69,38 @@ router.post('/familysearch', User.familySearch);
 //DELETE The Family
 router.delete('/destroyfamily', User.destroyFamily);
 
-//Create Genealogy
-router.get('/root', User.familyRoot);
+//Create Genealogy Tree
+router.post('/newtree', User.authorTree);
 
-//Create leaf
-router.post('/leaf', User.familyLeaf);
+//Create Leaf Genealogy Tree
+router.post('/newleaf', User.tree);
 
 //Create Spouse leaf
-router.post('/spouseleaf', User.familyLeafisSpouse);
+router.post('/spouseleaf', User.treeSpouse);
 
-//Update Root
-router.put('/rootupdate', uploadImage.uploadFile, User.rootUpdate);
+//Update Author Genealogy Tree
+router.put('/authorupdate', uploadImage.uploadFile, User.authorUpdate);
 
-//Update Leaf
+//Update Leaf Genealogy Tree
 router.put('/leafupdate', uploadImage.uploadFile, User.leafUpdate);
 
-//GET the family Root details of user
-router.post('/rootshowone', User.familyRootShowOne);
+//GET the Author details of Genealogy Tree
+router.post('/authshowone', User.authShowOne);
 
-//GET the family Leaf details of its root
-router.post('/leafshowone', User.familyLeafShowOne);
+//GET all Author Genealogy Tree details of user
+router.get('/authShowAll', User.authShowAll);
 
-//GET all Family Root details of user
-router.get('/rootshowall', User.familyRootShow);
+//GET the Leaf Genealogy Tree details 
+router.post('/leafshowone', User.leafShowOne);
 
-//GET all Family Leaf details of its Root
-router.post('/leafshowall', User.familyLeafShow);
+//GET all Leaf  details of its Genealogy Tree
+router.post('/leafshowall', User.leafShowAll);
+
+//DELETE The Genealogy Tree
+router.delete('/destroytree', User.destroyTree);
+
+//DELETE one Leaf Genealogy Tree
+router.delete('/destroyleaf', User.destroyLeaf);
+
 
 module.exports = router;

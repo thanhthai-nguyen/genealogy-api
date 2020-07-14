@@ -1,16 +1,27 @@
 const mongoose = require('mongoose');
 
-const leafSchema = new mongoose.Schema({
-    rootId: {
+const treeSchema = new mongoose.Schema({
+    authId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: false,
+        ref: 'Author'
+    },
+
+    parentId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'FamilyRoots'
     },
 
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User'
+    },
+
+
+    isSpouse: {
+        type: Boolean,
+        default: false
     },
 
     firstname: {
@@ -76,10 +87,6 @@ const leafSchema = new mongoose.Schema({
         max: 255
     },
 
-    isSpouse: {
-        type: Boolean,
-        default: false
-    },
 
     createdAt: {
         type: Date,
@@ -89,7 +96,7 @@ const leafSchema = new mongoose.Schema({
 
 }, {timestamps: true});
 
-leafSchema.pre('save',  function(next) {
+treeSchema.pre('save',  function(next) {
     const person = this;
     const firstname = person.firstname + " ";
     const middlename = person.middlename + " ";
@@ -107,4 +114,4 @@ leafSchema.pre('save',  function(next) {
 
 
 mongoose.set('useFindAndModify', false);
-module.exports = mongoose.model('FamilyLeafs', leafSchema);
+module.exports = mongoose.model('Genealogy', treeSchema);

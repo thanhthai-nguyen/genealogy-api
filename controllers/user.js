@@ -1,8 +1,8 @@
 const User = require('../models/user');
 const Event = require('../models/event');
 const Family = require('../models/family');
-const FamilyRoot = require('../models/familyRoot');
-const FamilyLeaf = require('../models/familyLeaf');
+const Author = require('../models/authorTree');
+const Tree = require('../models/genealogy');
 
 
 const sendEMail = require('../controllers/sendEmail');
@@ -165,7 +165,6 @@ exports.eventUpdate = async function (req, res) {
     try {
         const update = req.body;
         const id = req.body.id;
-        const userId = req.user._id;
         
         
         //Make sure the passed id is that of the logged in user
@@ -313,9 +312,7 @@ exports.familyUpdate = async function (req, res) {
        // res.redirect('/');
 
         const family = await Family.findByIdAndUpdate( {_id: ObjectId(id)}, {$set: update}, {new: true});
-        
-        await family.save();
- 
+         
         //if there is no image, return success message
         if (!req.file) {
             //console.log('User '+ user.email +' updated profile');
@@ -326,7 +323,6 @@ exports.familyUpdate = async function (req, res) {
         const family_ = await Family.findByIdAndUpdate( {_id: ObjectId(id)}, {$set: {profileImage: req.file.filename}}, {new: true});
         //console.log('User '+ user_.email +' uploaded image');
 
-        await family.save();
 
         return res.status(200).json({family: family_, message: 'Family has been updated'});
 
@@ -438,10 +434,11 @@ exports.destroyFamily = async function (req, res) {
 };
 
 
+
 // @route POST api/user/{id}
-// @desc  Create a new Family Root
+// @desc  Create a new Geanealogy Tree
 // @access Public
-exports.familyRoot = async function (req, res) {
+exports.authorTree = async function (req, res) {
     try {
         const userId = req.user._id;
 
@@ -452,18 +449,39 @@ exports.familyRoot = async function (req, res) {
         // res.redirect('/');
 
 
-        const user = await User.findById(userId);
+        const auth = new Author({
+            userId: userId,
+            treename: req.body.treename,
+            author: req.body.author,
+            address: req.body.address,
+            numGen: 1,
+            numMem: 1,
+            profileImage: req.body.imgauth,
+          });
+    
+        //Save author of tree
+        await auth.save();
 
-        const root = user.generateFamilyRoot();
-
-        root.treename   = 'genealogy';
-        root.author     = 'author';
-        root.firstname  = 'firstname';
-        root.lastname   = 'lastname';
-        // Save the updated event object
+        const root = new Tree({
+            userId: userId,
+            authId: auth._id,
+            parentId: auth._id,
+            firstname: req.body.firstname,
+            middlename: req.body.middlename,
+            lastname: req.body.lastname,
+            nickname: req.body.nickname,
+            sex: req.body.sex,
+            dob: req.body.dob,
+            domicile: req.body.domicile,
+            dod: req.body.dod,
+            burialplace: req.body.burialplace,
+            profileImage: req.body.imgroot,
+          });
+    
+        // Save root node 
         await root.save();
 
-        res.status(200).json({ root });
+        res.status(200).json({ auth, root});
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -471,12 +489,12 @@ exports.familyRoot = async function (req, res) {
 
 
 // @route POST api/user/{id}
-// @desc  Create a new Family Leaf
+// @desc  Create a new Leaf Genealogy Tree  
 // @access Public
-exports.familyLeaf = async function (req, res) {
+exports.tree = async function (req, res) {
     try {
         const userId = req.user._id;
-        const rootId = req.body.rootId;
+        const parentId = req.body.parentId;
 
         //Make sure the passed id is that of the logged in user
         //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
@@ -484,84 +502,80 @@ exports.familyLeaf = async function (req, res) {
         // if they aren't redirect them to the home page
         // res.redirect('/');
 
-      
-        const root = await FamilyRoot.findById({_id: ObjectId(rootId)});
-        
-        const leaf = root.generateFamilyLeaf();
-        leaf.firstname = 'firstname';
-        leaf.lastname  = 'lastname';
+        const parent = await Tree.findById(parentId);
 
-        // Save the updated event object
-        await leaf.save();
-       
-        res.status(200).json({ leaf });
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
-
-
-// @route POST api/user/{id}
-// @desc  Create a new Family Leaf is Spouse
-// @access Public
-exports.familyLeafisSpouse = async function (req, res) {
-    try {
-        const userId = req.user._id;
-        const rootId = req.body.rootId;
-
-        //Make sure the passed id is that of the logged in user
-        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
-        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
-        // if they aren't redirect them to the home page
-        // res.redirect('/');
-
-
-        const root = await FamilyRoot.findById({_id: ObjectId(rootId)});
-
-        const leaf = root.generateFamilyLeaf();
-
-        //Set is Spouse
-        leaf.isSpouse = true;
-        leaf.firstname = 'firstname';
-        leaf.lastname  = 'lastname';
-
-        // Save the updated event object
-        await leaf.save();
-
-        res.status(200).json({ leaf });
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-};
-
-
-// @route PUT api/user/{id}
-// @desc Update family Root
-// @access Public
-exports.rootUpdate = async function (req, res) {
-    try {
-        const update = req.body;
-        const rootId = req.body.rootId;
-        
-        //Make sure the passed id is that of the logged in user
-        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
-        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
-        // if they aren't redirect them to the home page
-       // res.redirect('/');
-
-        const root = await FamilyRoot.findByIdAndUpdate( {_id: ObjectId(rootId)}, {$set: update}, {new: true});
- 
-        //if there is no image, return success message
-        if (!req.file) {
-            //console.log('User '+ user.email +' updated profile');
-            return res.status(200).json({root, message: 'Family Root has been updated'});
+        if (!parent) {
+            return res.status(401).json({message: 'The parent node does not exist'});
         }
 
-        // There is image
-        const root_ = await FamilyRoot.findByIdAndUpdate( {_id: ObjectId(rootId)}, {$set: {profileImage: req.file.filename}}, {new: true});
-        //console.log('User '+ user_.email +' uploaded image');
+        const leaf = new Tree({
+            userId: userId,
+            authId: req.body.authId,
+            parentId: parentId,
+            firstname: req.body.firstname,
+            middlename: req.body.middlename,
+            lastname: req.body.lastname,
+            nickname: req.body.nickname,
+            sex: req.body.sex,
+            dob: req.body.dob,
+            domicile: req.body.domicile,
+            dod: req.body.dod,
+            burialplace: req.body.burialplace,
+            profileImage: req.body.profileImage
+          });
+    
+        // Save root node 
+        await leaf.save();
 
-        return res.status(200).json({root_, message: 'Family Root has been updated'});
+        return res.status(200).json({leaf, message: 'Genealogy has been updated'});
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route POST api/user/{id}
+// @desc  Create a new Leaf Genealogy Tree is Spouse
+// @access Public
+exports.treeSpouse = async function (req, res) {
+    try {
+        const userId = req.user._id;
+        const parentId = req.body.parentId;
+
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+        // res.redirect('/');
+
+        const parent = await Tree.findById(parentId);
+
+        if (!parent) {
+            return res.status(401).json({message: 'The parent node does not exist'});
+        }
+
+        const leaf = new Tree({
+            userId: userId,
+            parentId: parentId,
+            authId: req.body.authId,
+            isSpouse: true,
+            firstname: req.body.firstname,
+            middlename: req.body.middlename,
+            lastname: req.body.lastname,
+            nickname: req.body.nickname,
+            sex: req.body.sex,
+            dob: req.body.dob,
+            domicile: req.body.domicile,
+            dod: req.body.dod,
+            burialplace: req.body.burialplace,
+            profileImage: req.body.profileImage
+          });
+    
+        // Save root node 
+        await leaf.save();
+
+        return res.status(200).json({leaf, message: 'Genealogy has been updated'});
 
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -570,7 +584,7 @@ exports.rootUpdate = async function (req, res) {
 
 
 // @route PUT api/user/{id}
-// @desc Update family Leaf
+// @desc Update Leaf Genealogy 
 // @access Public
 exports.leafUpdate = async function (req, res) {
     try {
@@ -584,19 +598,19 @@ exports.leafUpdate = async function (req, res) {
         // if they aren't redirect them to the home page
        // res.redirect('/');
 
-        const leaf = await FamilyLeaf.findByIdAndUpdate( {_id: ObjectId(leafId)}, {$set: update}, {new: true});
+        const leaf = await Tree.findByIdAndUpdate( {_id: ObjectId(leafId)}, {$set: update}, {new: true});
          
         //if there is no image, return success message
         if (!req.file) {
             //console.log('User '+ user.email +' updated profile');
-            return res.status(200).json({leaf, message: 'Family Leaf has been updated'});
+            return res.status(200).json({leaf, message: 'Genealogy has been updated'});
         }
         
         // There is image
-        const leaf_ = await FamilyLeaf.findByIdAndUpdate( {_id: ObjectId(leafId)}, {$set: {profileImage: req.file.filename}}, {new: true});
+        const leaf_ = await Tree.findByIdAndUpdate( {_id: ObjectId(leafId)}, {$set: {profileImage: req.file.filename}}, {new: true});
         //console.log('User '+ user_.email +' uploaded image');
 
-        return res.status(200).json({leaf: leaf_, message: 'Family Leaf has been updated'});
+        return res.status(200).json({leaf_, message: 'Genealogy has been updated'});
 
     } catch (error) {
         
@@ -606,36 +620,10 @@ exports.leafUpdate = async function (req, res) {
 
 
 // @route POST api/user/{id}
-// @desc GET the family Root details of user
+// @desc GET one Leaf Genealogy Tree by ID
 // @access Public
-exports.familyRootShowOne = async function (req, res) {
+exports.leafShowOne = async function (req, res) {
     try {
-        const userId = req.user._id;
-        const rootId = req.body.rootId;
-        
-        //Make sure the passed id is that of the logged in user
-        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
-        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
-        // if they aren't redirect them to the home page
-       // res.redirect('/');
-
-        const root = await FamilyRoot.findById( {_id: ObjectId(rootId)});
-
-        if (!root) return res.status(401).json({message: 'There are no info to display'});
-
-        res.status(200).json({root});
-    } catch (error) {
-        
-        res.status(500).json({message: error.message});
-    }
-};
-
-// @route POST api/user/{id}
-// @desc GET the family Leaf details of its root
-// @access Public
-exports.familyLeafShowOne = async function (req, res) {
-    try {
-        const userId = req.user._id;
         const leafId = req.body.leafId;
         
         //Make sure the passed id is that of the logged in user
@@ -644,7 +632,7 @@ exports.familyLeafShowOne = async function (req, res) {
         // if they aren't redirect them to the home page
        // res.redirect('/');
 
-        const leaf = await FamilyLeaf.findById( {_id: ObjectId(leafId)});
+        const leaf = await Tree.findById( {_id: ObjectId(leafId)});
 
         if (!leaf) return res.status(401).json({message: 'There are no info to display'});
 
@@ -657,9 +645,96 @@ exports.familyLeafShowOne = async function (req, res) {
 
 
 // @route GET api/user/{id}
-// @desc GET all Family Root details of user
+// @desc GET ALL Author Genealogy Tree by ID
 // @access Public
-exports.familyRootShow = async function (req, res) {
+exports.leafShowAll = async function (req, res) {
+    try {
+        const authId = req.body.authId;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const leaf = await Tree.find({authId: authId});
+
+        if (!leaf) return res.status(401).json({message: 'There are no info to display'});
+
+        res.status(200).json({leaf});
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+
+
+// @route PUT api/user/{id}
+// @desc Update Author Genealogy Tree 
+// @access Public
+exports.authorUpdate = async function (req, res) {
+    try {
+        const update = req.body;
+        const authId = req.body.authId;
+        
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const auth = await Author.findByIdAndUpdate( {_id: ObjectId(authId)}, {$set: update}, {new: true});
+         
+        //if there is no image, return success message
+        if (!req.file) {
+            //console.log('User '+ user.email +' updated profile');
+            return res.status(200).json({auth, message: 'Genealogy has been updated'});
+        }
+        
+        // There is image
+        const auth_ = await Author.findByIdAndUpdate( {_id: ObjectId(authId)}, {$set: {profileImage: req.file.filename}}, {new: true});
+        //console.log('User '+ user_.email +' uploaded image');
+
+        return res.status(200).json({auth_, message: 'Genealogy has been updated'});
+
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+// @route POST api/user/{id}
+// @desc GET one Author Genealogy Tree by ID
+// @access Public
+exports.authShowOne = async function (req, res) {
+    try {
+        const authId = req.body.authId;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const auth = await Author.findById( {_id: ObjectId(authId)});
+
+        if (!auth) return res.status(401).json({message: 'There are no info to display'});
+
+        res.status(200).json({auth});
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route GET api/user/{id}
+// @desc GET ALL Author Genealogy Tree by ID
+// @access Public
+exports.authShowAll = async function (req, res) {
     try {
         const userId = req.user._id;
         
@@ -669,35 +744,79 @@ exports.familyRootShow = async function (req, res) {
         // if they aren't redirect them to the home page
        // res.redirect('/');
 
-        const root = await FamilyRoot.find({userId: userId});
+        const auth = await Author.find({userId: userId});
 
-        if (!root) return res.status(401).json({message: 'There are no info to display'});
+        if (!auth) return res.status(401).json({message: 'There are no info to display'});
 
-        res.status(200).json({root});
+        res.status(200).json({auth});
     } catch (error) {
         
         res.status(500).json({message: error.message});
     }
 };
 
-
-// @route GET api/user/{id}
-// @desc GET all Family Leaf details of its Root
+// @route DELETE api/user/{id}
+// @desc Delete one Genealogy Tree
 // @access Public
-exports.familyLeafShow = async function (req, res) {
+exports.destroyTree = async function (req, res) {
     try {
-        const rootId = req.body.rootId;
-        
+        const authId = req.body.authId;
+
+        //Make sure the passed id is that of the logged in user
+        //if (user_id.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to delete this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to delete this data."});
+
+        await Tree.deleteMany({ authId: authId });
+
+        await Author.findByIdAndDelete({_id: ObjectId(authId)});
+
+        res.status(200).json({message: 'The Genealogy Tree has been deleted'});
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route DELETE api/user/{id}
+// @desc Delete one Genealogy Tree
+// @access Public
+exports.destroyLeaf = async function (req, res) {
+    try {
+        const leafId = req.body.leafId;
+
+        //Make sure the passed id is that of the logged in user
+        //if (user_id.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to delete this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to delete this data."});
+
+        await Tree.findByIdAndDelete({_id: ObjectId(leafId)});
+
+        res.status(200).json({message: 'The Leaf Genealogy Tree has been deleted'});
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+// @route POST api/user/{id}
+// @desc Upload Image
+// @access Public
+exports.uploadimage = async function (req, res) {
+    try {
+       
         //Make sure the passed id is that of the logged in user
         //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
         if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
         // if they aren't redirect them to the home page
        // res.redirect('/');
 
-        const leaf = await FamilyLeaf.find({rootId: rootId});
 
-        if (!leaf) return res.status(401).json({message: 'There are no info to display'});
-        res.status(200).json({leaf});
+        //if there is no image, return success message
+        if (!req.file) {
+            return res.status(401).json({message: 'There is no image. Please check out again'});
+        }
+        
+        // There is image
+        return res.status(200).json({profileImage: req.file.filename});
+
     } catch (error) {
         
         res.status(500).json({message: error.message});

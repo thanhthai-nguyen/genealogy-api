@@ -10,7 +10,7 @@ const router = express.Router();
 
 
 //UPDATE
-router.put('/update', uploadImage.uploadFile);
+router.post('/update', uploadImage.uploadFile);
 
 //DISPLAY IMAGE
 router.get('/image/:filename', uploadImage.displayImage);
