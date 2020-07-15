@@ -541,7 +541,7 @@ exports.tree = async function (req, res) {
 exports.treeSpouse = async function (req, res) {
     try {
         const userId = req.user._id;
-        const parentId = req.body.parentId;
+        const spouseId = req.body.spouseId;
 
         //Make sure the passed id is that of the logged in user
         //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
@@ -549,15 +549,15 @@ exports.treeSpouse = async function (req, res) {
         // if they aren't redirect them to the home page
         // res.redirect('/');
 
-        const parent = await Tree.findById(parentId);
+        const spouse = await Tree.findById(spouseId);
 
-        if (!parent) {
-            return res.status(401).json({message: 'The parent node does not exist'});
+        if (!spouse) {
+            return res.status(401).json({message: 'The spouse node does not exist'});
         }
 
         const leaf = new Tree({
             userId: userId,
-            parentId: parentId,
+            spouseId: spouseId,
             authId: req.body.authId,
             isSpouse: true,
             firstname: req.body.firstname,
@@ -581,6 +581,7 @@ exports.treeSpouse = async function (req, res) {
         res.status(500).json({message: error.message});
     }
 };
+
 
 
 // @route PUT api/user/{id}
@@ -645,7 +646,7 @@ exports.leafShowOne = async function (req, res) {
 
 
 // @route GET api/user/{id}
-// @desc GET ALL Author Genealogy Tree by ID
+// @desc GET ALL Leaf Genealogy Tree of Author
 // @access Public
 exports.leafShowAll = async function (req, res) {
     try {
@@ -662,6 +663,56 @@ exports.leafShowAll = async function (req, res) {
         if (!leaf) return res.status(401).json({message: 'There are no info to display'});
 
         res.status(200).json({leaf});
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route GET api/user/{id}
+// @desc GET ALL Leaf Genealogy Tree of Parent Node
+// @access Public
+exports.leafShow = async function (req, res) {
+    try {
+        const parentId = req.body.parentId;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const leaf = await Tree.find({parentId: parentId});
+
+        if (!leaf) return res.status(401).json({message: 'There are no info to display'});
+
+        res.status(200).json({leaf});
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route GET api/user/{id}
+// @desc GET ALL Leaf Spouse Genealogy Tree of Parent Node
+// @access Public
+exports.leafSpouseShow = async function (req, res) {
+    try {
+        const spouseId = req.body.spouseId;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const leafspouse = await Tree.find({spouseId: spouseId});
+
+        if (!leafspouse) return res.status(401).json({message: 'There are no info to display'});
+
+        res.status(200).json({leafspouse});
     } catch (error) {
         
         res.status(500).json({message: error.message});
@@ -787,6 +838,15 @@ exports.destroyLeaf = async function (req, res) {
         //Make sure the passed id is that of the logged in user
         //if (user_id.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to delete this data."});
         if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to delete this data."});
+
+        const leaf = await Tree.findOne({parentId: leafId});
+        console.log(leaf);
+        if (leaf) return res.status(401).json({message: 'Cannot be deleted because this node has branches'});
+
+        const leafspouse = await Tree.findOne({spouseId: leafId});
+        //console.log(leafspouse);
+        if (leafspouse) return res.status(401).json({message: 'Cannot be deleted because this node has branches'});
+
 
         await Tree.findByIdAndDelete({_id: ObjectId(leafId)});
 

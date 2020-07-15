@@ -88,10 +88,16 @@ router.put('/leafupdate', uploadImage.uploadFile, User.leafUpdate);
 router.post('/authshowone', User.authShowOne);
 
 //GET all Author Genealogy Tree details of user
-router.get('/authShowAll', User.authShowAll);
+router.get('/authshowAll', User.authShowAll);
 
 //GET the Leaf Genealogy Tree details 
 router.post('/leafshowone', User.leafShowOne);
+
+//GET all Leaf Genealogy Tree of Parent Node
+router.post('/leafshow', User.leafShow);
+
+//GET all Leaf Spouse Genealogy Tree of Parent Node
+router.post('/leafspouseshow', User.leafSpouseShow);
 
 //GET all Leaf  details of its Genealogy Tree
 router.post('/leafshowall', User.leafShowAll);

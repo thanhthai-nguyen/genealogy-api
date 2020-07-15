@@ -9,7 +9,12 @@ const treeSchema = new mongoose.Schema({
 
     parentId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
+        required: false,
+    },
+
+    spouseId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: false,
     },
 
     userId: {
