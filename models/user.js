@@ -96,6 +96,7 @@ UserSchema.pre('save',  function(next) {
             if (err) return next(err);
 
             user.password = hash;
+        
             next();
         });
     });
@@ -117,7 +118,7 @@ UserSchema.methods.generateJWT = function() {
     };
 
     return jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: '43200m' //expires in 15m
+        expiresIn: '15m' //expires in 15m
     });
 };
 
@@ -150,23 +151,6 @@ UserSchema.methods.generateVerificationToken = function() {
     return new Token(payload);
 };
 
-UserSchema.methods.generateEvent = function() {
-    let payload = {
-        userId: this._id,
-        eventImage: null
-    };
-
-    return new Event(payload);
-};
-
-UserSchema.methods.generateFamily = function() {
-    let payload = {
-        userId: this._id,
-        profileImage: null
-    };
-
-    return new Family(payload);
-};
 
 
 mongoose.set('useFindAndModify', false);

@@ -144,10 +144,17 @@ exports.events = async function (req, res) {
         // if they aren't redirect them to the home page
         // res.redirect('/');
 
-
-        const user = await User.findById(userId);
-
-        const event = user.generateEvent();
+        const event = new Event({
+            userId: userId,
+            event: req.body.event,
+            time: req.body.time,
+            date: req.body.date,
+            catelogy: req.body.catelogy,
+            group: req.body.group,
+            bio: req.body.bio,
+            address: req.body.address,
+            eventImage: req.body.eventImage,
+          });
         // Save the updated event object
         await event.save();
 
@@ -276,14 +283,25 @@ exports.family = async function (req, res) {
         // res.redirect('/');
 
 
-        const user = await User.findById(userId);
-
-        const family = user.generateFamily();
-
-        //Set the name
-        family.firstname = 'Họ';
-        family.middlename = "";
-        family.lastname = 'Tên';
+        const family = new Family({
+            userId: userId,
+            firstname: req.body.firstname,
+            middlename: req.body.middlename,
+            lastname: req.body.lastname,
+            email: req.body.email,
+            nickname: req.body.nickname,
+            numphone: req.body.numphone,
+            sex: req.body.sex,
+            datebirth: req.body.datebirth,
+            job: req.body.job,
+            address: req.body.address,
+            parentage: req.body.parentage,
+            relatives: req.body.relatives,
+            nation: req.body.nation,
+            religion: req.body.religion,
+            yourself: req.body.yourself,
+            profileImage: req.body.profileImage,
+          });
        
         // Save the updated event object
         await family.save();
@@ -383,13 +401,14 @@ exports.familyShow = async function (req, res) {
 };
 
 
+
 // @route POST api/user/{id}
 // @desc Search by name
 // @access Public
 exports.familySearch = async function (req, res) {
     try {
         const userId = req.user._id;
-        const name = req.body.name;
+        const name = req.body.name.trim();
         
         //Make sure the passed id is that of the logged in user
         //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
