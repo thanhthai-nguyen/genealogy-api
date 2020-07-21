@@ -331,6 +331,7 @@ exports.familyUpdate = async function (req, res) {
 
         const family = await Family.findByIdAndUpdate( {_id: ObjectId(id)}, {$set: update}, {new: true});
          
+        await family.save();
         //if there is no image, return success message
         if (!req.file) {
             //console.log('User '+ user.email +' updated profile');
@@ -619,7 +620,8 @@ exports.leafUpdate = async function (req, res) {
        // res.redirect('/');
 
         const leaf = await Tree.findByIdAndUpdate( {_id: ObjectId(leafId)}, {$set: update}, {new: true});
-         
+        
+        await leaf.save();
         //if there is no image, return success message
         if (!req.file) {
             //console.log('User '+ user.email +' updated profile');
