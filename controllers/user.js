@@ -302,10 +302,11 @@ exports.family = async function (req, res) {
             yourself: req.body.yourself,
             profileImage: req.body.profileImage,
           });
+          
        
         // Save the updated event object
         await family.save();
-
+        
         res.status(200).json({ family: family });
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -523,10 +524,18 @@ exports.tree = async function (req, res) {
         // res.redirect('/');
 
         const parent = await Tree.findById(parentId);
+        const auth = await Author.findById(req.body.authId);
 
         if (!parent) {
             return res.status(401).json({message: 'The parent node does not exist'});
         }
+
+        // const Gen = await Tree.findOne({ parentId: parentId });
+
+        // if (!Gen) {
+        //     auth.numGen = auth.numGen + 1;
+        // }
+
 
         const leaf = new Tree({
             userId: userId,
@@ -546,6 +555,12 @@ exports.tree = async function (req, res) {
     
         // Save root node 
         await leaf.save();
+
+       
+        auth.numMem = auth.numMem + 1;
+        
+        await auth.save();
+
 
         return res.status(200).json({leaf, message: 'Genealogy has been updated'});
 
@@ -594,6 +609,12 @@ exports.treeSpouse = async function (req, res) {
     
         // Save root node 
         await leaf.save();
+
+        const auth = await Author.findById(req.body.authId);
+
+        auth.numMem = auth.numMem + 1;
+        
+        await auth.save();
 
         return res.status(200).json({leaf, message: 'Genealogy has been updated'});
 
@@ -861,13 +882,21 @@ exports.destroyLeaf = async function (req, res) {
         if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to delete this data."});
 
         const leaf = await Tree.findOne({parentId: leafId});
-        console.log(leaf);
+        
+        //console.log(leaf);
         if (leaf) return res.status(401).json({message: 'Cannot be deleted because this node has branches'});
 
         const leafspouse = await Tree.findOne({spouseId: leafId});
         //console.log(leafspouse);
         if (leafspouse) return res.status(401).json({message: 'Cannot be deleted because this node has branches'});
 
+        const leaf_ = await Tree.findById({_id: leafId});
+        
+        const auth = await Author.findById(ObjectId(leaf_.authId));
+
+        auth.numMem = auth.numMem - 1;
+        
+        await auth.save();
 
         await Tree.findByIdAndDelete({_id: ObjectId(leafId)});
 
@@ -903,3 +932,36 @@ exports.uploadimage = async function (req, res) {
         res.status(500).json({message: error.message});
     }
 };
+
+
+
+// @route GET api/user/{id}
+// @desc GET ALL Users linked with Family 
+// @access Public
+exports.friends = async function (req, res) {
+    try {
+        const userId = req.user._id;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const friends = await Family.find({email: req.user.email}, 'userId')
+                                    .populate({
+                                        path: "userId",
+                                        select: "email username numphone address profileImage",
+                                        model: User,
+                                    });
+
+        if (!friends) return res.status(401).json({message: 'There are no info to display'});
+
+
+        res.status(200).json({friends});
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+

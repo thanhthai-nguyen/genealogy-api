@@ -108,5 +108,8 @@ router.delete('/destroytree', User.destroyTree);
 //DELETE one Leaf Genealogy Tree
 router.delete('/destroyleaf', User.destroyLeaf);
 
+//GET Friends Linked with Family
+router.get('/friends', User.friends);
+
 
 module.exports = router;

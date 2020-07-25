@@ -33,13 +33,13 @@ const authorSchema = new mongoose.Schema({
     },
     
     numGen: {
-        type: String,
+        type: Number,
         required: false,
         max: 255
     },
 
     numMem: {
-        type: String,
+        type: Number,
         required: false,
         max: 255
     },

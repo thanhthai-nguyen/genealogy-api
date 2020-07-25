@@ -33,7 +33,7 @@ const familySchema = new mongoose.Schema({
         required: false,
         trim: true,
         lowercase: true,
-        ref: 'User'
+        ref: 'Users'
     },
 
     nickname: {
