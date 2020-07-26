@@ -965,3 +965,89 @@ exports.friends = async function (req, res) {
     }
 };
 
+
+// @route GET api/user/{id}
+// @desc GET ALL Author Genealogy Tree isPublish by ID 
+// @access Public
+exports.publicGenealogy = async function (req, res) {
+    try {
+        const userId = req.body.userId;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const auth = await Author.find({userId: userId, isPublish: true});
+
+        if (!auth) return res.status(401).json({message: 'There are no info to display'});
+
+        res.status(200).json({auth});
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+
+// @route GET api/user/{id}
+// @desc Share the Genealogy
+// @access Public
+exports.shareGenealogy = async function (req, res) {
+    try {
+        const userId = req.user._id;
+        const authId = req.body.authId;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const auth = await Author.findById( {_id: ObjectId(authId)});
+
+        if (!auth) return res.status(401).json({message: 'There are no info to display'});
+
+        auth.isPublish = true;
+
+        await auth.save();
+
+        res.status(200).json({auth});
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+
+// @route GET api/user/{id}
+// @desc Remove Share the Genealogy
+// @access Public
+exports.removeShareGenealogy = async function (req, res) {
+    try {
+        const userId = req.user._id;
+        const authId = req.body.authId;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const auth = await Author.findById( {_id: ObjectId(authId)});
+
+        if (!auth) return res.status(401).json({message: 'There are no info to display'});
+
+        auth.isPublish = false;
+
+        await auth.save();
+
+        res.status(200).json({auth});
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};

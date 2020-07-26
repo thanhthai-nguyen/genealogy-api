@@ -111,5 +111,13 @@ router.delete('/destroyleaf', User.destroyLeaf);
 //GET Friends Linked with Family
 router.get('/friends', User.friends);
 
+//Share the Genealogy
+router.post('/sharetree', User.shareGenealogy);
+
+//Remove Share the Genealogy
+router.post('/resharetree', User.removeShareGenealogy);
+
+//GET ALL Author Genealogy Tree isPublish by ID
+router.post('/publictree', User.publicGenealogy);
 
 module.exports = router;

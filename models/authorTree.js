@@ -8,6 +8,11 @@ const authorSchema = new mongoose.Schema({
         ref: 'User'
     },
 
+    isPublish: {
+        type: Boolean,
+        default: false
+    },
+
     treename: {
         type: String,
         required: 'Genealogy name is required',
