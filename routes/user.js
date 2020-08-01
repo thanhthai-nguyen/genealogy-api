@@ -120,4 +120,7 @@ router.post('/resharetree', User.removeShareGenealogy);
 //GET ALL Author Genealogy Tree isPublish by ID
 router.post('/publictree', User.publicGenealogy);
 
+//GET Tree Linked with with numphone of Node 
+router.post('/linktree', User.numphoneLink);
+
 module.exports = router;

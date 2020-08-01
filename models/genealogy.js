@@ -62,6 +62,13 @@ const treeSchema = new mongoose.Schema({
         max: 255
     },
 
+    numphone: {
+        type: String,
+        required: false,
+        trim: true,
+        max: 255
+    },
+
     dob: {
         type: String,
         required: false,

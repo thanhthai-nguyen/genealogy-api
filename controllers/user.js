@@ -492,6 +492,7 @@ exports.authorTree = async function (req, res) {
             lastname: req.body.lastname,
             nickname: req.body.nickname,
             sex: req.body.sex,
+            numphone: req.body.numphone,
             dob: req.body.dob,
             domicile: req.body.domicile,
             dod: req.body.dod,
@@ -546,6 +547,7 @@ exports.tree = async function (req, res) {
             lastname: req.body.lastname,
             nickname: req.body.nickname,
             sex: req.body.sex,
+            numphone: req.body.numphone,
             dob: req.body.dob,
             domicile: req.body.domicile,
             dod: req.body.dod,
@@ -599,6 +601,7 @@ exports.treeSpouse = async function (req, res) {
             middlename: req.body.middlename,
             lastname: req.body.lastname,
             nickname: req.body.nickname,
+            numphone: req.body.numphone,
             sex: req.body.sex,
             dob: req.body.dob,
             domicile: req.body.domicile,
@@ -951,7 +954,7 @@ exports.friends = async function (req, res) {
         const friends = await Family.find({email: req.user.email}, 'userId')
                                     .populate({
                                         path: "userId",
-                                        select: "email username numphone address profileImage",
+                                        select: "email username numphone profileImage",
                                         model: User,
                                     });
 
@@ -1046,6 +1049,37 @@ exports.removeShareGenealogy = async function (req, res) {
         await auth.save();
 
         res.status(200).json({auth});
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route GET api/user/{id}
+// @desc GET ALL Author Tree linked with numphone of Node 
+// @access Public
+exports.numphoneLink = async function (req, res) {
+    try {
+        const userId = req.user._id;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const tree = await Tree.find({numphone: req.body.numphone}, 'authId')
+                                    .populate({
+                                        path: "authId",
+                                        select: "treename author address numMem profileImage",
+                                        model: Author,
+                                    });
+
+        if (!tree) return res.status(401).json({message: 'There are no info to display'});
+
+
+        res.status(200).json({tree});
     } catch (error) {
         
         res.status(500).json({message: error.message});
