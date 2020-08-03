@@ -53,52 +53,54 @@ const treeSchema = new mongoose.Schema({
     nickname: {
         type: String,
         required: false,
-        max: 255
+        max: 50
     },
 
     sex: {
         type: String,
         required: false,
-        max: 255
     },
 
     numphone: {
         type: String,
         required: false,
         trim: true,
-        max: 255
+        max: 15
     },
 
     dob: {
         type: String,
         required: false,
-        max: 255
+        max: 100
     },
 
     domicile: {
         type: String,
         required: false,
-        max: 255
+        max: 100
     },
 
     dod: {
         type: String,
         required: false,
-        max: 255
+        max: 100
     },
 
     burialplace: {
         type: String,
         required: false,
-        max: 255
+        max: 100
+    },
+
+    rank: {
+        type: Number,
+        required: false,
     },
 
     profileImage: {
         type: String,
         required: false,
-        max: 255
     },
-
 
     createdAt: {
         type: Date,

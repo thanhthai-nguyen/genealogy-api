@@ -498,6 +498,7 @@ exports.authorTree = async function (req, res) {
             dod: req.body.dod,
             burialplace: req.body.burialplace,
             profileImage: req.body.imgroot,
+            rank: req.body.rank,
           });
     
         // Save root node 
@@ -552,7 +553,8 @@ exports.tree = async function (req, res) {
             domicile: req.body.domicile,
             dod: req.body.dod,
             burialplace: req.body.burialplace,
-            profileImage: req.body.profileImage
+            profileImage: req.body.profileImage,
+            rank: req.body.rank,
           });
     
         // Save root node 
@@ -607,7 +609,8 @@ exports.treeSpouse = async function (req, res) {
             domicile: req.body.domicile,
             dod: req.body.dod,
             burialplace: req.body.burialplace,
-            profileImage: req.body.profileImage
+            profileImage: req.body.profileImage,
+            rank: req.body.rank,
           });
     
         // Save root node 
