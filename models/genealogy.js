@@ -17,12 +17,16 @@ const treeSchema = new mongoose.Schema({
         required: false,
     },
 
+    childId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: false,
+    },
+
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User'
     },
-
 
     isSpouse: {
         type: Boolean,
@@ -100,6 +104,11 @@ const treeSchema = new mongoose.Schema({
     profileImage: {
         type: String,
         required: false,
+    },
+
+    sort: {
+        type: Number,
+        require: false,
     },
 
     createdAt: {

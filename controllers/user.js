@@ -477,6 +477,8 @@ exports.authorTree = async function (req, res) {
             address: req.body.address,
             numGen: 1,
             numMem: 1,
+            countParents: 0,
+            countChilds: 0,
             profileImage: req.body.imgauth,
           });
     
@@ -499,10 +501,12 @@ exports.authorTree = async function (req, res) {
             burialplace: req.body.burialplace,
             profileImage: req.body.imgroot,
             rank: req.body.rank,
+            sort: 0,
           });
     
         // Save root node 
         await root.save();
+        
 
         res.status(200).json({ auth, root});
     } catch (error) {
@@ -514,7 +518,7 @@ exports.authorTree = async function (req, res) {
 // @route POST api/user/{id}
 // @desc  Create a new Leaf Genealogy Tree  
 // @access Public
-exports.tree = async function (req, res) {
+exports.childs = async function (req, res) {
     try {
         const userId = req.user._id;
         const parentId = req.body.parentId;
@@ -531,12 +535,6 @@ exports.tree = async function (req, res) {
         if (!parent) {
             return res.status(401).json({message: 'The parent node does not exist'});
         }
-
-        // const Gen = await Tree.findOne({ parentId: parentId });
-
-        // if (!Gen) {
-        //     auth.numGen = auth.numGen + 1;
-        // }
 
 
         const leaf = new Tree({
@@ -555,13 +553,17 @@ exports.tree = async function (req, res) {
             burialplace: req.body.burialplace,
             profileImage: req.body.profileImage,
             rank: req.body.rank,
+            sort: 0,
           });
     
         // Save root node 
         await leaf.save();
 
-       
+        // leaf.sort = auth.countParents + 1;
+        // await leaf.save();
+
         auth.numMem = auth.numMem + 1;
+        // auth.countChilds = leaf.sort;
         
         await auth.save();
 
@@ -577,7 +579,7 @@ exports.tree = async function (req, res) {
 // @route POST api/user/{id}
 // @desc  Create a new Leaf Genealogy Tree is Spouse
 // @access Public
-exports.treeSpouse = async function (req, res) {
+exports.spouses = async function (req, res) {
     try {
         const userId = req.user._id;
         const spouseId = req.body.spouseId;
@@ -611,6 +613,7 @@ exports.treeSpouse = async function (req, res) {
             burialplace: req.body.burialplace,
             profileImage: req.body.profileImage,
             rank: req.body.rank,
+            sort: 0,
           });
     
         // Save root node 
@@ -619,6 +622,68 @@ exports.treeSpouse = async function (req, res) {
         const auth = await Author.findById(req.body.authId);
 
         auth.numMem = auth.numMem + 1;
+        
+        await auth.save();
+
+        return res.status(200).json({leaf, message: 'Genealogy has been updated'});
+
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+
+// @route POST api/user/{id}
+// @desc  Create a new Leaf Genealogy Tree is Spouse
+// @access Public
+exports.parents = async function (req, res) {
+    try {
+        const userId = req.user._id;
+        const childId = req.body.childId;
+
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+        // res.redirect('/');
+
+        const child = await Tree.findById(childId);
+
+        if (!child) {
+            return res.status(401).json({message: 'The node does not exist'});
+        }
+
+        const leaf = new Tree({
+            userId: userId,
+            parentId: req.body.authId,
+            authId: req.body.authId,
+            firstname: req.body.firstname,
+            middlename: req.body.middlename,
+            lastname: req.body.lastname,
+            nickname: req.body.nickname,
+            numphone: req.body.numphone,
+            sex: req.body.sex,
+            dob: req.body.dob,
+            domicile: req.body.domicile,
+            dod: req.body.dod,
+            burialplace: req.body.burialplace,
+            profileImage: req.body.profileImage,
+            rank: req.body.rank,
+          });
+
+        
+        child.parentId =leaf._id;
+
+        await child.save();
+
+        const auth = await Author.findById(req.body.authId);
+
+        leaf.sort = auth.countParents - 1;
+        // Save root node 
+        await leaf.save();
+
+        auth.numMem = auth.numMem + 1;
+        auth.countParents = leaf.sort;
         
         await auth.save();
 
@@ -706,7 +771,7 @@ exports.leafShowAll = async function (req, res) {
         // if they aren't redirect them to the home page
        // res.redirect('/');
 
-        const leaf = await Tree.find({authId: authId});
+        const leaf = await Tree.find({authId: authId}).sort({sort: 1});
 
         if (!leaf) return res.status(401).json({message: 'There are no info to display'});
 
@@ -742,6 +807,29 @@ exports.leafShow = async function (req, res) {
     }
 };
 
+// @route GET api/user/{id}
+// @desc GET ALL Leaf Spouse Genealogy Tree of Parent Node
+// @access Public
+exports.leafParentShow = async function (req, res) {
+    try {
+        const childId = req.body.childId;
+        
+        //Make sure the passed id is that of the logged in user
+        //if (userId.toString() !== id.toString()) return res.status(401).json({message: "Sorry, you don't have the permission to upd this data."});
+        if (!req.isAuthenticated()) return res.status(401).json({message: "Sorry, you don't have the permission to update this data."});
+        // if they aren't redirect them to the home page
+       // res.redirect('/');
+
+        const leafparent = await Tree.find({childId: childId});
+
+        if (!leafparent) return res.status(401).json({message: 'There are no info to display'});
+
+        res.status(200).json({leafparent});
+    } catch (error) {
+        
+        res.status(500).json({message: error.message});
+    }
+};
 
 // @route GET api/user/{id}
 // @desc GET ALL Leaf Spouse Genealogy Tree of Parent Node
@@ -896,10 +984,14 @@ exports.destroyLeaf = async function (req, res) {
         //console.log(leafspouse);
         if (leafspouse) return res.status(401).json({message: 'Cannot be deleted because this node has branches'});
 
+
         const leaf_ = await Tree.findById({_id: leafId});
         
         const auth = await Author.findById(ObjectId(leaf_.authId));
 
+        if (leaf_.sort < 0)  {
+            auth.countParents =auth.countParents + 1;
+        }
         auth.numMem = auth.numMem - 1;
         
         await auth.save();

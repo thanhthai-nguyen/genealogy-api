@@ -40,13 +40,21 @@ const authorSchema = new mongoose.Schema({
     numGen: {
         type: Number,
         required: false,
-        max: 255
     },
 
     numMem: {
         type: Number,
         required: false,
-        max: 255
+    },
+
+    countParents: {
+        type: Number,
+        required: false,
+    },
+
+    countChilds: {
+        type: Number,
+        required: false,
     },
 
     createdAt: {

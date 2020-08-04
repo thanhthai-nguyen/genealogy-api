@@ -73,10 +73,13 @@ router.delete('/destroyfamily', User.destroyFamily);
 router.post('/newtree', User.authorTree);
 
 //Create Leaf Genealogy Tree
-router.post('/newleaf', User.tree);
+router.post('/newleaf', User.childs);
+
+//Create Parent Leaf 
+router.post('/parentleaf', User.parents);
 
 //Create Spouse leaf
-router.post('/spouseleaf', User.treeSpouse);
+router.post('/spouseleaf', User.spouses);
 
 //Update Author Genealogy Tree
 router.put('/authorupdate', uploadImage.uploadFile, User.authorUpdate);
