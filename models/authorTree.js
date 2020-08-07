@@ -16,24 +16,28 @@ const authorSchema = new mongoose.Schema({
     treename: {
         type: String,
         required: 'Genealogy name is required',
+        trim: true,
         max: 255
     },
 
     author: {
         type: String,
         required: 'User create is required',
+        trim: true,
         max: 255
     },
 
     address: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
     profileImage: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
     

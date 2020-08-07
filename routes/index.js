@@ -12,9 +12,16 @@ module.exports = app => {
         res.render('home');
     });
     
+    //api xác thực đăng nhập/đăng ký
     app.use('/api/auth', auth);
+
+    //api liên quan đến các chức năng (user account, event, family, genealogy, news )
     app.use('/api/user', authenticate, user);
+
+    //api phụ dành cho việc test
     app.use('/api/normal', normal);
+
+    //api liên kết tài khoản mạng xã hội
     app.use('/api/social', socialAuth);
 
 

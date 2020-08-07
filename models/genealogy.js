@@ -41,28 +41,33 @@ const treeSchema = new mongoose.Schema({
 
     middlename: {
         type: String,
+        trim: true,
         required: false
     },
 
     lastname: {
         type: String,
+        trim: true,
         required: 'Your last name is required'
     },
 
     fullname: {
         type: String,
         required: false,
+        trim: true,
     },
     
     nickname: {
         type: String,
         required: false,
+        trim: true,
         max: 50
     },
 
     sex: {
         type: String,
         required: false,
+        trim: true,
     },
 
     numphone: {
@@ -75,24 +80,28 @@ const treeSchema = new mongoose.Schema({
     dob: {
         type: String,
         required: false,
+        trim: true,
         max: 100
     },
 
     domicile: {
         type: String,
         required: false,
+        trim: true,
         max: 100
     },
 
     dod: {
         type: String,
         required: false,
+        trim: true,
         max: 100
     },
 
     burialplace: {
         type: String,
         required: false,
+        trim: true,
         max: 100
     },
 
@@ -103,12 +112,14 @@ const treeSchema = new mongoose.Schema({
 
     profileImage: {
         type: String,
+        trim: true,
         required: false,
     },
 
     sort: {
         type: Number,
         require: false,
+        trim: true,
     },
 
     createdAt: {

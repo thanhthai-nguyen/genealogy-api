@@ -15,17 +15,20 @@ const familySchema = new mongoose.Schema({
 
     middlename: {
         type: String,
+        trim: true,
         required: false
     },
 
     lastname: {
         type: String,
         required: 'Your last name is required',
+        trim: true,
     },
 
     fullname: {
         type: String,
         required: false,
+        trim: true,
     },
 
     email: {
@@ -39,6 +42,7 @@ const familySchema = new mongoose.Schema({
     nickname: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
@@ -52,6 +56,7 @@ const familySchema = new mongoose.Schema({
     sex: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
     
@@ -64,42 +69,49 @@ const familySchema = new mongoose.Schema({
     address: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
     job: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
     parentage: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
     yourself: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
     relatives: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
     nation: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
     religion: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 

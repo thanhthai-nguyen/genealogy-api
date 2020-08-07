@@ -1,6 +1,9 @@
 const express = require('express');
 const {check} = require('express-validator');
 const User = require('../controllers/user');
+const Event = require('../controllers/event');
+const Family = require('../controllers/family');
+const Genealogy = require('../controllers/genealogy');
 const uploadImage = require('../controllers/uploadImage');
 
 const multer = require('multer');
@@ -34,96 +37,96 @@ router.get('/image/:filename', uploadImage.displayImage);
 router.delete('/destroy', User.destroy);
 
 //CREATE EVENT
-router.post('/event', User.events);
+router.post('/event', Event.events);
 
 //UPDATE EVENT
-router.put('/eventupdate', uploadImage.uploadFile ,User.eventUpdate);
+router.put('/eventupdate', uploadImage.uploadFile ,Event.eventUpdate);
 
 //GET THE EVENT BY ID
-router.post('/eventshowone', User.eventShowOne);
+router.post('/eventshowone', Event.eventShowOne);
 
 //GET EVENTS
-router.get('/eventshow', User.eventShow);
+router.get('/eventshow', Event.eventShow);
 
 //DELETE The Event
-router.delete('/destroyevent', User.destroyEvent);
+router.delete('/destroyevent', Event.destroyEvent);
 
 //CREATE FAMILY
-router.post('/family', User.family);
+router.post('/family', Family.family);
 
 //UPDATE FAMILY
 router.put('/familyupdate',[
     check('firstname').not().isEmpty().withMessage('Your firstname is required'),
     check('lastname').not().isEmpty().withMessage('Your lastname is required'),
-], validate, uploadImage.uploadFile ,User.familyUpdate);
+], validate, uploadImage.uploadFile ,Family.familyUpdate);
 
 //GET THE FAMILY BY ID
-router.post('/familyshowone', User.familyShowOne);
+router.post('/familyshowone', Family.familyShowOne);
 
 //GET FAMILYS
-router.get('/familyshow', User.familyShow);
+router.get('/familyshow', Family.familyShow);
 
 //Search familys by name
-router.post('/familysearch', User.familySearch);
+router.post('/familysearch', Family.familySearch);
 
 //DELETE The Family
-router.delete('/destroyfamily', User.destroyFamily);
+router.delete('/destroyfamily', Family.destroyFamily);
 
 //Create Genealogy Tree
-router.post('/newtree', User.authorTree);
+router.post('/newtree', Genealogy.authorTree);
 
 //Create Leaf Genealogy Tree
-router.post('/newleaf', User.childs);
+router.post('/newleaf', Genealogy.childs);
 
 //Create Parent Leaf 
-router.post('/parentleaf', User.parents);
+router.post('/parentleaf', Genealogy.parents);
 
 //Create Spouse leaf
-router.post('/spouseleaf', User.spouses);
+router.post('/spouseleaf', Genealogy.spouses);
 
 //Update Author Genealogy Tree
-router.put('/authorupdate', uploadImage.uploadFile, User.authorUpdate);
+router.put('/authorupdate', uploadImage.uploadFile, Genealogy.authorUpdate);
 
 //Update Leaf Genealogy Tree
-router.put('/leafupdate', uploadImage.uploadFile, User.leafUpdate);
+router.put('/leafupdate', uploadImage.uploadFile, Genealogy.leafUpdate);
 
 //GET the Author details of Genealogy Tree
-router.post('/authshowone', User.authShowOne);
+router.post('/authshowone', Genealogy.authShowOne);
 
 //GET all Author Genealogy Tree details of user
-router.get('/authshowAll', User.authShowAll);
+router.get('/authshowAll', Genealogy.authShowAll);
 
 //GET the Leaf Genealogy Tree details 
-router.post('/leafshowone', User.leafShowOne);
+router.post('/leafshowone', Genealogy.leafShowOne);
 
 //GET all Leaf Genealogy Tree of Parent Node
-router.post('/leafshow', User.leafShow);
+router.post('/leafshow', Genealogy.leafShow);
 
 //GET all Leaf Spouse Genealogy Tree of Parent Node
-router.post('/leafspouseshow', User.leafSpouseShow);
+router.post('/leafspouseshow', Genealogy.leafSpouseShow);
 
 //GET all Leaf  details of its Genealogy Tree
-router.post('/leafshowall', User.leafShowAll);
+router.post('/leafshowall', Genealogy.leafShowAll);
 
 //DELETE The Genealogy Tree
-router.delete('/destroytree', User.destroyTree);
+router.delete('/destroytree', Genealogy.destroyTree);
 
 //DELETE one Leaf Genealogy Tree
-router.delete('/destroyleaf', User.destroyLeaf);
+router.delete('/destroyleaf', Genealogy.destroyLeaf);
 
 //GET Friends Linked with Family
-router.get('/friends', User.friends);
+router.get('/friends', Genealogy.friends);
 
 //Share the Genealogy
-router.post('/sharetree', User.shareGenealogy);
+router.post('/sharetree', Genealogy.shareGenealogy);
 
 //Remove Share the Genealogy
-router.post('/resharetree', User.removeShareGenealogy);
+router.post('/resharetree', Genealogy.removeShareGenealogy);
 
 //GET ALL Author Genealogy Tree isPublish by ID
-router.post('/publictree', User.publicGenealogy);
+router.post('/publictree', Genealogy.publicGenealogy);
 
 //GET Tree Linked with with numphone of Node 
-router.post('/linktree', User.numphoneLink);
+router.post('/linktree', Genealogy.numphoneLink);
 
 module.exports = router;

@@ -10,40 +10,47 @@ const eventSchema = new mongoose.Schema({
     event: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
     time: {
         type: String,
+        trim: true,
         required: false
     },
 
     date: {
         type: String,
+        trim: true,
         required: false
     },
 
     catelogy: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
     group: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
     bio: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
     address: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 

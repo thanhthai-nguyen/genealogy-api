@@ -21,6 +21,7 @@ const UserSchema = new mongoose.Schema({
     username: {
         type: String,
         unique: true,
+        trim: true,
         required: 'Your username is required',
     },
 
@@ -33,6 +34,7 @@ const UserSchema = new mongoose.Schema({
     nickname: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
@@ -46,24 +48,28 @@ const UserSchema = new mongoose.Schema({
     sex: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
     
     datebirth: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
     address: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
     profileImage: {
         type: String,
         required: false,
+        trim: true,
         max: 255
     },
 
